@@ -20,14 +20,18 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build Production Bundle
-        run: npm run build
+      - name: Locate, Install & Build Frontend
+        run: |
+          TARGET_DIR=$(find . -name "package.json" -not -path "*/node_modules/*" | head -n 1 | xargs dirname)
+          echo "Target frontend directory found: $TARGET_DIR"
+          cd "$TARGET_DIR"
+          npm install
+          npm run build
+          mkdir -p $GITHUB_WORKSPACE/deploy_dist
+          cp -r dist/* $GITHUB_WORKSPACE/deploy_dist/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
+          publish_dir: ./deploy_dist
