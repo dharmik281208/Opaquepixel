@@ -164,44 +164,44 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Glass Drawer Menu */}
+      {/* Mobile Glass Backdrop Blur Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-x-4 top-20 z-50 glass rounded-3xl p-4 shadow-2xl border border-emerald-500/30 animate-fade-up">
+        <div className="md:hidden fixed inset-x-4 top-20 z-50 bg-black/85 backdrop-blur-3xl saturate-200 rounded-3xl p-5 shadow-2xl border border-emerald-500/40 animate-fade-up overflow-hidden">
           <nav className="flex flex-col gap-2" aria-label="Main Mobile">
             {authed ? (
               <>
                 <Link
                   to="/hide"
                   onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/hide" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/hide" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
                 >
                   Hide
                 </Link>
                 <Link
                   to="/reveal"
                   onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/reveal" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/reveal" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
                 >
                   Reveal
                 </Link>
                 <Link
                   to="/scan"
                   onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/scan" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/scan" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
                 >
                   Scan &amp; Decode
                 </Link>
                 <Link
                   to="/how-it-works"
                   onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
                 >
                   How It Works
                 </Link>
                 <Link
                   to="/contact"
                   onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
                 >
                   Contact &amp; Collab
                 </Link>
@@ -213,7 +213,7 @@ export default function Header() {
                     key={href}
                     href={href}
                     onClick={handleLinkClick}
-                    className="px-4 py-3 rounded-2xl text-sm font-medium text-surface-dim hover:text-white hover:bg-white/5 transition-all"
+                    className="px-4 py-3 rounded-2xl text-sm font-medium text-surface-dim hover:text-white hover:bg-white/10 transition-all"
                   >
                     {label}
                   </a>
@@ -221,14 +221,14 @@ export default function Header() {
                 <Link
                   to="/how-it-works"
                   onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
                 >
                   How It Works
                 </Link>
                 <Link
                   to="/contact"
                   onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
                 >
                   Contact &amp; Collab
                 </Link>
