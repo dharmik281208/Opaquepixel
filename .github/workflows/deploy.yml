@@ -3,6 +3,7 @@ name: Deploy OpaquePixel to GitHub Pages
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,14 +20,16 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install Dependencies & Build Frontend
-        working-directory: ./pixelvault-frontend
-        run: |
-          npm install
-          npm run build
+      - name: Install Dependencies
+        working-directory: pixelvault-frontend
+        run: npm install
 
-      - name: Deploy to GitHub Pages Branch
+      - name: Build Production Bundle
+        working-directory: pixelvault-frontend
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./pixelvault-frontend/dist
+          publish_dir: pixelvault-frontend/dist
