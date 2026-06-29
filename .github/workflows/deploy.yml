@@ -26,7 +26,8 @@ jobs:
           echo "Target frontend directory found: $TARGET_DIR"
           cd "$TARGET_DIR"
           npm install
-          npm run build
+          chmod +x node_modules/.bin/* 2>/dev/null || true
+          npx vite build
           mkdir -p $GITHUB_WORKSPACE/deploy_dist
           cp -r dist/* $GITHUB_WORKSPACE/deploy_dist/
 
