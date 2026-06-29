@@ -24,13 +24,6 @@ API.interceptors.response.use(
   }
 );
 
-export async function verifyAuthQr(qrImage) {
-  const form = new FormData();
-  form.append("qr_image", qrImage);
-  const res = await API.post("/auth/verify", form);
-  return res.data;
-}
-
 export async function hidePayload({
   carrier,
   payload,
