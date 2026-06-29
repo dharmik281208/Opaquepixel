@@ -1,22 +1,19 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";
-import { isAuthenticated, clearAccessToken } from "../../utils/auth";
 import { getInitialTheme, applyTheme } from "../../utils/theme";
 
-const PUBLIC_LINKS = [
-  { href: "/#hero", label: "Home" },
-  { href: "/#about", label: "About" },
-  { href: "/#pipeline", label: "Pipeline" },
-  { href: "/#formats", label: "Formats" },
-  { href: "/#access", label: "Access" },
+const NAV_ITEMS = [
+  { to: "/", label: "Home" },
+  { to: "/hide", label: "Hide" },
+  { to: "/reveal", label: "Reveal" },
+  { to: "/scan", label: "Scan & Decode" },
+  { to: "/how-it-works", label: "How It Works" },
+  { to: "/contact", label: "Contact & Collab" },
 ];
 
 export default function Header() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const authed = isAuthenticated();
-  const onHome = location.pathname === "/";
   const [theme, setThemeState] = useState(getInitialTheme());
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -26,22 +23,6 @@ export default function Header() {
     applyTheme(next);
   };
 
-  const logout = () => {
-    clearAccessToken();
-    setMobileMenuOpen(false);
-    navigate("/", { replace: true });
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  };
-
-  const scrollToAccess = () => {
-    setMobileMenuOpen(false);
-    if (onHome) {
-      document.getElementById("access")?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      navigate("/#access");
-    }
-  };
-
   const handleLinkClick = () => {
     setMobileMenuOpen(false);
   };
@@ -49,66 +30,21 @@ export default function Header() {
   return (
     <header className="site-header relative z-40">
       <div className="site-container flex items-center justify-between gap-4 py-3">
-        <Link to={authed ? "/hide" : "/"} onClick={handleLinkClick} className="header-logo shrink-0">
+        <Link to="/" onClick={handleLinkClick} className="header-logo shrink-0">
           <Logo size="sm" showText={true} />
         </Link>
 
         {/* Desktop Nav Pill */}
         <nav className="nav-pill hidden md:flex items-center gap-1 mx-auto" aria-label="Main Desktop">
-          {authed ? (
-            <>
-              <Link
-                to="/hide"
-                className={`nav-link ${location.pathname === "/hide" ? "nav-link-active" : ""}`}
-              >
-                Hide
-              </Link>
-              <Link
-                to="/reveal"
-                className={`nav-link ${location.pathname === "/reveal" ? "nav-link-active" : ""}`}
-              >
-                Reveal
-              </Link>
-              <Link
-                to="/scan"
-                className={`nav-link ${location.pathname === "/scan" ? "nav-link-active" : ""}`}
-              >
-                Scan &amp; Decode
-              </Link>
-              <Link
-                to="/how-it-works"
-                className={`nav-link ${location.pathname === "/how-it-works" ? "nav-link-active" : ""}`}
-              >
-                How It Works
-              </Link>
-              <Link
-                to="/contact"
-                className={`nav-link ${location.pathname === "/contact" ? "nav-link-active" : ""}`}
-              >
-                Contact &amp; Collab
-              </Link>
-            </>
-          ) : (
-            <>
-              {PUBLIC_LINKS.map(({ href, label }) => (
-                <a key={href} href={href} className="nav-link">
-                  {label}
-                </a>
-              ))}
-              <Link
-                to="/how-it-works"
-                className={`nav-link ${location.pathname === "/how-it-works" ? "nav-link-active" : ""}`}
-              >
-                How It Works
-              </Link>
-              <Link
-                to="/contact"
-                className={`nav-link ${location.pathname === "/contact" ? "nav-link-active" : ""}`}
-              >
-                Contact &amp; Collab
-              </Link>
-            </>
-          )}
+          {NAV_ITEMS.map(({ to, label }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`nav-link ${location.pathname === to ? "nav-link-active" : ""}`}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
 
         {/* Right Action Buttons */}
@@ -134,16 +70,6 @@ export default function Header() {
             </div>
           </button>
 
-          {authed ? (
-            <button type="button" onClick={logout} className="btn-ghost text-xs px-4 sm:px-5 py-2 sm:py-2.5 font-medium tracking-wide">
-              Exit
-            </button>
-          ) : (
-            <button type="button" onClick={scrollToAccess} className="btn-talk">
-              Enter
-            </button>
-          )}
-
           {/* Mobile Hamburger Button */}
           <button
             type="button"
@@ -168,72 +94,16 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-x-4 top-20 z-50 bg-black/85 backdrop-blur-3xl saturate-200 rounded-3xl p-5 shadow-2xl border border-emerald-500/40 animate-fade-up overflow-hidden">
           <nav className="flex flex-col gap-2" aria-label="Main Mobile">
-            {authed ? (
-              <>
-                <Link
-                  to="/hide"
-                  onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/hide" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
-                >
-                  Hide
-                </Link>
-                <Link
-                  to="/reveal"
-                  onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/reveal" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
-                >
-                  Reveal
-                </Link>
-                <Link
-                  to="/scan"
-                  onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/scan" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
-                >
-                  Scan &amp; Decode
-                </Link>
-                <Link
-                  to="/how-it-works"
-                  onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
-                >
-                  How It Works
-                </Link>
-                <Link
-                  to="/contact"
-                  onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
-                >
-                  Contact &amp; Collab
-                </Link>
-              </>
-            ) : (
-              <>
-                {PUBLIC_LINKS.map(({ href, label }) => (
-                  <a
-                    key={href}
-                    href={href}
-                    onClick={handleLinkClick}
-                    className="px-4 py-3 rounded-2xl text-sm font-medium text-surface-dim hover:text-white hover:bg-white/10 transition-all"
-                  >
-                    {label}
-                  </a>
-                ))}
-                <Link
-                  to="/how-it-works"
-                  onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
-                >
-                  How It Works
-                </Link>
-                <Link
-                  to="/contact"
-                  onClick={handleLinkClick}
-                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
-                >
-                  Contact &amp; Collab
-                </Link>
-              </>
-            )}
+            {NAV_ITEMS.map(({ to, label }) => (
+              <Link
+                key={to}
+                to={to}
+                onClick={handleLinkClick}
+                className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === to ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/10"}`}
+              >
+                {label}
+              </Link>
+            ))}
           </nav>
         </div>
       )}

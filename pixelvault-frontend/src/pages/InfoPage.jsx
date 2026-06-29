@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import AuthScanZone from "../components/AuthScanZone";
+import { useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
 import GlassCard from "../components/GlassCard";
 import WhatsAppCompressionNotice from "../components/WhatsAppCompressionNotice";
-import Toast from "../components/Toast";
 import SectionTag from "../components/ui/SectionTag";
 import SectionHeading from "../components/ui/SectionHeading";
 import Marquee from "../components/ui/Marquee";
 import FormatOrbs from "../components/ui/FormatOrbs";
-import { verifyAuthQr } from "../api/opaquepixel";
-import { setAccessToken } from "../utils/auth";
 
 const PIPELINE = [
   { n: "01", label: "Package", sub: "Metadata + compress" },
@@ -43,34 +39,6 @@ export default function InfoPage() {
     });
   }, [location.pathname, location.hash]);
 
-  const [qrFile, setQrFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
-  const navigate = useNavigate();
-
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    if (!qrFile) {
-      setToast({ message: "Upload your auth token", type: "error" });
-      return;
-    }
-    setLoading(true);
-    try {
-      const data = await verifyAuthQr(qrFile);
-      setAccessToken(data.access_token);
-      setToast({ message: "Welcome in", type: "success" });
-      setTimeout(() => navigate("/hide"), 600);
-    } catch (err) {
-      const detail = err.response?.data?.detail;
-      setToast({
-        message: typeof detail === "string" ? detail : "Verification failed",
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="page-stack pb-12">
       {/* Hero */}
@@ -86,9 +54,9 @@ export default function InfoPage() {
           privacy &amp; research.
         </p>
         <div className="flex flex-wrap justify-center gap-3 mt-10">
-          <a href="#access" className="btn-primary">
+          <Link to="/hide" className="btn-primary">
             Get started
-          </a>
+          </Link>
           <a href="#about" className="btn-ghost">
             Learn more
           </a>
@@ -214,43 +182,52 @@ export default function InfoPage() {
         </div>
       </section>
 
-      {/* Access / Contact */}
+      {/* Quick Launch / Platform Tools */}
       <section id="access" className="section-block opacity-0 animate-fade-up delay-5">
         <SectionHeading
-          tag="Contact"
-          title="Let's talk"
-          lead="Upload your authorized auth token to unlock Hide & Reveal."
+          tag="Platform Tools"
+          title="Start using Opaque Pixel"
+          lead="Direct access to steganography tools without any authentication required."
           center
         />
         <div className="grid md:grid-cols-3 gap-5 mt-10">
-          <div className="contact-card md:col-span-2">
-            <h3 className="font-display text-lg font-semibold text-white">Get access</h3>
-            <p className="text-xs text-surface-dim mt-2 leading-relaxed">
-              Auth tokens are distributed offline by your administrator.
-            </p>
-            <form onSubmit={handleVerify} className="mt-6 space-y-5">
-              <AuthScanZone file={qrFile} onFile={setQrFile} loading={loading} />
-              <button type="submit" disabled={loading || !qrFile} className="btn-primary w-full">
-                {loading ? "Verifying…" : "Enter platform →"}
-              </button>
-            </form>
-          </div>
-          <div className="space-y-5">
-            <div className="contact-card">
-              <h3 className="font-display text-sm font-semibold text-white">Hide</h3>
-              <p className="text-xs text-surface-dim mt-2">Embed encrypted data in carriers.</p>
-              <span className="contact-card-badge mt-4">After auth</span>
+          <GlassCard className="contact-card flex flex-col justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold text-white">Hide Data</h3>
+              <p className="text-xs text-surface-dim mt-2 leading-relaxed">
+                Embed encrypted text or files invisibly inside image, video, and document carriers.
+              </p>
             </div>
-            <div className="contact-card">
-              <h3 className="font-display text-sm font-semibold text-white">Reveal</h3>
-              <p className="text-xs text-surface-dim mt-2">Extract hidden payloads with password.</p>
-              <span className="contact-card-badge mt-4">After auth</span>
+            <Link to="/hide" className="btn-primary w-full mt-6 text-center block">
+              Launch Hide Tool →
+            </Link>
+          </GlassCard>
+
+          <GlassCard className="contact-card flex flex-col justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold text-white">Reveal Secret</h3>
+              <p className="text-xs text-surface-dim mt-2 leading-relaxed">
+                Extract and decrypt hidden payloads from carrier files using your secure password.
+              </p>
             </div>
-          </div>
+            <Link to="/reveal" className="btn-ghost w-full mt-6 text-center block border-emerald-500/30 hover:border-emerald-500">
+              Launch Reveal Tool →
+            </Link>
+          </GlassCard>
+
+          <GlassCard className="contact-card flex flex-col justify-between">
+            <div>
+              <h3 className="font-display text-lg font-semibold text-white">Scan &amp; Inspect</h3>
+              <p className="text-xs text-surface-dim mt-2 leading-relaxed">
+                Analyze files for potential steganographic payloads and structure breakdown.
+              </p>
+            </div>
+            <Link to="/scan" className="btn-ghost w-full mt-6 text-center block border-emerald-500/30 hover:border-emerald-500">
+              Launch Scan Tool →
+            </Link>
+          </GlassCard>
         </div>
       </section>
-
-      <Toast message={toast?.message} type={toast?.type} onClose={() => setToast(null)} />
     </div>
   );
 }
