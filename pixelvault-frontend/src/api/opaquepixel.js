@@ -2,7 +2,7 @@ import axios from "axios";
 import { getAccessToken, clearAccessToken } from "../utils/auth";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  baseURL: import.meta.env.VITE_API_URL || "https://opaquepixel-api.onrender.com",
   timeout: 120000,
 });
 
