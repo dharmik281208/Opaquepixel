@@ -18,6 +18,7 @@ export default function Header() {
   const authed = isAuthenticated();
   const onHome = location.pathname === "/";
   const [theme, setThemeState] = useState(getInitialTheme());
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleTheme = () => {
     const next = theme === "bw" ? "green" : "bw";
@@ -27,11 +28,13 @@ export default function Header() {
 
   const logout = () => {
     clearAccessToken();
+    setMobileMenuOpen(false);
     navigate("/", { replace: true });
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   };
 
   const scrollToAccess = () => {
+    setMobileMenuOpen(false);
     if (onHome) {
       document.getElementById("access")?.scrollIntoView({ behavior: "smooth" });
     } else {
@@ -39,14 +42,19 @@ export default function Header() {
     }
   };
 
+  const handleLinkClick = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="site-header">
-      <div className="site-container site-header-inner">
-        <Link to={authed ? "/hide" : "/"} className="header-logo">
+    <header className="site-header relative z-40">
+      <div className="site-container flex items-center justify-between gap-4 py-3">
+        <Link to={authed ? "/hide" : "/"} onClick={handleLinkClick} className="header-logo shrink-0">
           <Logo size="sm" showText={true} />
         </Link>
 
-        <nav className="nav-pill header-nav" aria-label="Main">
+        {/* Desktop Nav Pill */}
+        <nav className="nav-pill hidden md:flex items-center gap-1 mx-auto" aria-label="Main Desktop">
           {authed ? (
             <>
               <Link
@@ -103,7 +111,8 @@ export default function Header() {
           )}
         </nav>
 
-        <div className="header-actions flex items-center gap-3">
+        {/* Right Action Buttons */}
+        <div className="header-actions flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             type="button"
             onClick={toggleTheme}
@@ -126,7 +135,7 @@ export default function Header() {
           </button>
 
           {authed ? (
-            <button type="button" onClick={logout} className="btn-ghost text-xs px-5 py-2.5 font-medium tracking-wide">
+            <button type="button" onClick={logout} className="btn-ghost text-xs px-4 sm:px-5 py-2 sm:py-2.5 font-medium tracking-wide">
               Exit
             </button>
           ) : (
@@ -134,8 +143,100 @@ export default function Header() {
               Enter
             </button>
           )}
+
+          {/* Mobile Hamburger Button */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            className="md:hidden btn-ghost p-2.5 flex items-center justify-center rounded-full text-white"
+            aria-label="Toggle Mobile Menu"
+          >
+            {mobileMenuOpen ? (
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+              </svg>
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Glass Drawer Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed inset-x-4 top-20 z-50 glass rounded-3xl p-4 shadow-2xl border border-emerald-500/30 animate-fade-up">
+          <nav className="flex flex-col gap-2" aria-label="Main Mobile">
+            {authed ? (
+              <>
+                <Link
+                  to="/hide"
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/hide" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                >
+                  Hide
+                </Link>
+                <Link
+                  to="/reveal"
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/reveal" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                >
+                  Reveal
+                </Link>
+                <Link
+                  to="/scan"
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/scan" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                >
+                  Scan &amp; Decode
+                </Link>
+                <Link
+                  to="/how-it-works"
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                >
+                  How It Works
+                </Link>
+                <Link
+                  to="/contact"
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                >
+                  Contact &amp; Collab
+                </Link>
+              </>
+            ) : (
+              <>
+                {PUBLIC_LINKS.map(({ href, label }) => (
+                  <a
+                    key={href}
+                    href={href}
+                    onClick={handleLinkClick}
+                    className="px-4 py-3 rounded-2xl text-sm font-medium text-surface-dim hover:text-white hover:bg-white/5 transition-all"
+                  >
+                    {label}
+                  </a>
+                ))}
+                <Link
+                  to="/how-it-works"
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/how-it-works" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                >
+                  How It Works
+                </Link>
+                <Link
+                  to="/contact"
+                  onClick={handleLinkClick}
+                  className={`px-4 py-3 rounded-2xl text-sm font-medium transition-all ${location.pathname === "/contact" ? "bg-white text-black font-bold" : "text-surface-dim hover:text-white hover:bg-white/5"}`}
+                >
+                  Contact &amp; Collab
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
