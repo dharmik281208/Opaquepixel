@@ -149,7 +149,7 @@ def _reencode_h264(path: Path) -> None:
                 "-crf",
                 "18",
                 "-preset",
-                "medium",
+                "ultrafast",
                 str(temp_path),
             ],
             check=True,
