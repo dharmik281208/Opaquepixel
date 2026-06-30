@@ -4,7 +4,7 @@ import { getAccessToken, clearAccessToken } from "../utils/auth";
 const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const API = axios.create({
   baseURL: isLocal ? "http://localhost:8000" : "https://opaquepixel-api.onrender.com",
-  timeout: 120000,
+  timeout: 300000,
 });
 
 API.interceptors.request.use((config) => {
