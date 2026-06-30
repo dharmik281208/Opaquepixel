@@ -3,7 +3,7 @@ import { getAccessToken, clearAccessToken } from "../utils/auth";
 
 const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const API = axios.create({
-  baseURL: isLocal ? "http://localhost:8000/api" : "https://opaquepixel-api.onrender.com/api",
+  baseURL: isLocal ? "http://localhost:8000" : "https://opaquepixel-api.onrender.com",
   timeout: 120000,
 });
 
@@ -24,6 +24,13 @@ API.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+export async function verifyAuthQr(qrImage) {
+  const form = new FormData();
+  form.append("qr_image", qrImage);
+  const res = await API.post("/api/auth/verify", form);
+  return res.data;
+}
 
 export async function hidePayload({
   carrier,
@@ -50,7 +57,7 @@ export async function hidePayload({
     form.append("payload", payload);
   }
 
-  const res = await API.post("/hide", form, { responseType: "blob" });
+  const res = await API.post("/api/hide", form, { responseType: "blob" });
   return res.data;
 }
 
@@ -61,7 +68,7 @@ export async function revealPayload({ carrier, password, carrierType, stegoMetho
   form.append("carrier_type", carrierType);
   if (stegoMethod) form.append("stego_method", stegoMethod);
 
-  const res = await API.post("/reveal", form);
+  const res = await API.post("/api/reveal", form);
   return res.data;
 }
 
@@ -71,11 +78,11 @@ export async function scanCarrier({ carrier, carrierType, stegoMethod }) {
   form.append("carrier_type", carrierType);
   if (stegoMethod) form.append("stego_method", stegoMethod);
 
-  const res = await API.post("/scan", form);
+  const res = await API.post("/api/scan", form);
   return res.data;
 }
 
 export async function checkHealth() {
-  const res = await API.get("/health");
+  const res = await API.get("/api/health");
   return res.data;
 }

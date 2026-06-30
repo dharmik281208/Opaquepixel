@@ -1,0 +1,11 @@
+node_modules/
+.env
+dist/
+.venv/
+.idea/
+.pytest_cache/
+*.pyc
+__pycache__/
+tmp/
+.git/
+index.lock
