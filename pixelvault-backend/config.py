@@ -12,7 +12,7 @@ ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         "ALLOWED_ORIGINS",
-        "http://localhost:5173,http://127.0.0.1:5173,https://opaquepixel.app",
+        "http://localhost:5173,http://127.0.0.1:5173,https://opaquepixel.app,https://www.opaquepixel.app,https://dharmik281208.github.io",
     ).split(",")
     if origin.strip()
 ]
