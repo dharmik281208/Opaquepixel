@@ -114,6 +114,26 @@ export default function HidePage() {
     }
   };
 
+  const handleCarrierChange = (file) => {
+    if (file && file.size > 10 * 1024 * 1024) {
+      setToast({
+        message: "Warning: Carrier files >10MB can trigger Render proxy timeouts. Consider using a smaller image.",
+        type: "warning"
+      });
+    }
+    setCarrier(file);
+  };
+
+  const handlePayloadFileChange = (file) => {
+    if (file && file.size > 5 * 1024 * 1024) {
+      setToast({
+        message: "Warning: Payloads >5MB can trigger Render proxy timeouts. Consider using a smaller file.",
+        type: "warning"
+      });
+    }
+    setPayloadFile(file);
+  };
+
   const reset = () => {
     setResult(null);
     setCarrier(null);
@@ -155,7 +175,7 @@ export default function HidePage() {
           {(carrierType === "image" || carrierType === "video") && (
             <WhatsAppCompressionNotice compact />
           )}
-          <DropZone label={`Upload ${carrierType}`} accept={carrierAccept} file={carrier} onFile={setCarrier} hint={carrierHint} />
+          <DropZone label={`Upload ${carrierType}`} accept={carrierAccept} file={carrier} onFile={handleCarrierChange} hint={carrierHint} />
           <AlgorithmSelector value={stegoMethod} onChange={setStegoMethod} disabled={carrierType !== "image"} />
         </GlassCard>
 
@@ -175,7 +195,7 @@ export default function HidePage() {
               maxLength={100000}
             />
           ) : (
-            <DropZone label="Upload payload" accept={PAYLOAD_ACCEPT[payloadMode]} file={payloadFile} onFile={setPayloadFile} />
+            <DropZone label="Upload payload" accept={PAYLOAD_ACCEPT[payloadMode]} file={payloadFile} onFile={handlePayloadFileChange} />
           )}
           <CapacityBar payloadSize={payloadSize} capacity={capacity} loading={capacityLoading} />
         </GlassCard>

@@ -60,6 +60,16 @@ export default function RevealPage() {
     }
   };
 
+  const handleCarrierChange = (file) => {
+    if (file && file.size > 10 * 1024 * 1024) {
+      setToast({
+        message: "Warning: Stego files >10MB can trigger Render proxy timeouts. Consider using a smaller file.",
+        type: "warning"
+      });
+    }
+    setCarrier(file);
+  };
+
   const reset = () => {
     setResult(null);
     setCarrier(null);
@@ -96,7 +106,7 @@ export default function RevealPage() {
             <WhatsAppCompressionNotice compact />
           )}
 
-          <DropZone label="Upload stego file" accept={carrierAccept} file={carrier} onFile={setCarrier} />
+          <DropZone label="Upload stego file" accept={carrierAccept} file={carrier} onFile={handleCarrierChange} />
 
           <AlgorithmSelector
             value={stegoMethod}

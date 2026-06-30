@@ -163,6 +163,16 @@ export default function ScanPage() {
     return `Forensic ${stegoMethod.toUpperCase()} Steganography Scan In Progress`;
   };
 
+  const handleCarrierChange = (file) => {
+    if (file && file.size > 10 * 1024 * 1024) {
+      setToast({
+        message: "Warning: Stego files >10MB can trigger Render proxy timeouts. Consider using a smaller file.",
+        type: "warning"
+      });
+    }
+    setCarrier(file);
+  };
+
   return (
     <div className="page-stack workspace-page">
       <PageHero
@@ -184,7 +194,7 @@ export default function ScanPage() {
               <WhatsAppCompressionNotice compact />
             )}
 
-            <DropZone label={`Upload ${carrierType} for forensic analysis`} accept={carrierAccept} file={carrier} onFile={setCarrier} />
+            <DropZone label={`Upload ${carrierType} for forensic analysis`} accept={carrierAccept} file={carrier} onFile={handleCarrierChange} />
 
             {carrierType === "image" && (
               <AlgorithmSelector
