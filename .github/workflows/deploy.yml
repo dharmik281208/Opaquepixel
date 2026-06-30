@@ -24,8 +24,8 @@ jobs:
         env:
           VITE_API_URL: https://opaquepixel-api.onrender.com
         run: |
-          TARGET_DIR=$(find . -name "package.json" -not -path "*/node_modules/*" | head -n 1 | xargs dirname)
-          echo "Target frontend directory found: $TARGET_DIR"
+          TARGET_DIR="pixelvault-frontend"
+          echo "Target frontend directory set to: $TARGET_DIR"
           cd "$TARGET_DIR"
           npm install
           chmod +x node_modules/.bin/* 2>/dev/null || true
