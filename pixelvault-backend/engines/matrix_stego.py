@@ -42,43 +42,40 @@ def hide_in_image(cover_bgr: np.ndarray, payload_bits: list[int]) -> np.ndarray:
         
     rgb = cv2.cvtColor(cover_bgr, cv2.COLOR_BGR2RGB)
     flat = rgb.flatten().astype(np.uint8)
-    n_pixels = len(flat)
     
-    bit_idx = 0
-    total_bits = len(payload_bits)
-    
-    # Process in blocks of 7 subpixels (embedding 3 bits per block)
-    for i in range(0, n_pixels - 6, 7):
-        if bit_idx >= total_bits:
-            break
-
-        # Extract 3 bits to embed
-        chunk = payload_bits[bit_idx : bit_idx + 3]
-        actual_k = len(chunk)
-        if actual_k < 3:
-            # Pad with zeros if at the very end
-            chunk = chunk + [0] * (3 - actual_k)
-            
-        m1, m2, m3 = chunk[0], chunk[1], chunk[2]
-        target_syndrome = (m1 << 2) | (m2 << 1) | m3
-
-        # Extract current 7 LSBs
-        block_lsbs = flat[i : i + 7] & 1
+    # Pad payload_bits with zeros to make it a multiple of 3
+    remainder = len(payload_bits) % 3
+    if remainder != 0:
+        payload_bits = payload_bits + [0] * (3 - remainder)
         
-        # Calculate current syndrome using Hamming H matrix
-        v1, v2, v3, v4, v5, v6, v7 = [int(x) for x in block_lsbs]
-        s1 = v4 ^ v5 ^ v6 ^ v7
-        s2 = v2 ^ v3 ^ v6 ^ v7
-        s3 = v1 ^ v3 ^ v5 ^ v7
-        current_syndrome = (s1 << 2) | (s2 << 1) | s3
-
-        diff = int(target_syndrome ^ current_syndrome)
-        if diff > 0:
-            # Flip the LSB of subpixel at index (diff - 1)
-            flip_idx = i + (diff - 1)
-            flat[flip_idx] = flat[flip_idx] ^ 1
-
-        bit_idx += actual_k
+    bits_arr = np.array(payload_bits, dtype=np.uint8)
+    N = len(bits_arr) // 3
+    
+    if 7 * N > len(flat):
+        raise ValueError("Payload exceeds Matrix carrier capacity")
+        
+    # Reshape payload bits into N blocks of 3 bits
+    payload_matrix = bits_arr.reshape((N, 3))
+    target_syndromes = (payload_matrix[:, 0].astype(np.int32) << 2) | \
+                       (payload_matrix[:, 1].astype(np.int32) << 1) | \
+                       payload_matrix[:, 2].astype(np.int32)
+                       
+    # Slice the first 7 * N subpixels and reshape into N blocks of 7 LSBs
+    block_lsbs = (flat[:7 * N].reshape((N, 7)) & 1).astype(np.int32)
+    
+    # Calculate current syndromes using Hamming matrix logic
+    s1 = block_lsbs[:, 3] ^ block_lsbs[:, 4] ^ block_lsbs[:, 5] ^ block_lsbs[:, 6]
+    s2 = block_lsbs[:, 1] ^ block_lsbs[:, 2] ^ block_lsbs[:, 5] ^ block_lsbs[:, 6]
+    s3 = block_lsbs[:, 0] ^ block_lsbs[:, 2] ^ block_lsbs[:, 4] ^ block_lsbs[:, 6]
+    current_syndromes = (s1 << 2) | (s2 << 1) | s3
+    
+    diffs = target_syndromes ^ current_syndromes
+    modify_mask = diffs > 0
+    
+    if np.any(modify_mask):
+        # Calculate flat indices of subpixels whose LSB needs to be flipped
+        flip_indices = 7 * np.arange(N)[modify_mask] + (diffs[modify_mask] - 1)
+        flat[flip_indices] ^= 1
 
     modified = _unflatten_pixels(flat, rgb.shape)
     return cv2.cvtColor(modified, cv2.COLOR_RGB2BGR)
@@ -89,24 +86,18 @@ def reveal_from_image(stego_bgr: np.ndarray, num_bits: int) -> list[int]:
         raise ValueError("Invalid stego image provided for Matrix extraction")
         
     flat = _flatten_pixels(stego_bgr)
-    n_pixels = len(flat)
-    extracted_bits: list[int] = []
-
-    for i in range(0, n_pixels - 6, 7):
-        if len(extracted_bits) >= num_bits:
-            break
-
-        block_lsbs = flat[i : i + 7] & 1
-        v1, v2, v3, v4, v5, v6, v7 = [int(x) for x in block_lsbs]
-        s1 = v4 ^ v5 ^ v6 ^ v7
-        s2 = v2 ^ v3 ^ v6 ^ v7
-        s3 = v1 ^ v3 ^ v5 ^ v7
+    N = (num_bits + 2) // 3
+    
+    if 7 * N > len(flat):
+        N = len(flat) // 7
         
-        chunk = [int(s1), int(s2), int(s3)]
-        rem = num_bits - len(extracted_bits)
-        extracted_bits.extend(chunk[:rem])
-
-    return extracted_bits
+    block_lsbs = (flat[:7 * N].reshape((N, 7)) & 1).astype(np.int32)
+    s1 = block_lsbs[:, 3] ^ block_lsbs[:, 4] ^ block_lsbs[:, 5] ^ block_lsbs[:, 6]
+    s2 = block_lsbs[:, 1] ^ block_lsbs[:, 2] ^ block_lsbs[:, 5] ^ block_lsbs[:, 6]
+    s3 = block_lsbs[:, 0] ^ block_lsbs[:, 2] ^ block_lsbs[:, 4] ^ block_lsbs[:, 6]
+    
+    bits_matrix = np.column_stack((s1, s2, s3)).astype(np.uint8)
+    return bits_matrix.flatten()[:num_bits].tolist()
 
 
 def hide_payload_in_image(

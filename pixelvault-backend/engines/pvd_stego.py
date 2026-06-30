@@ -31,29 +31,24 @@ def hide_in_image(cover_bgr: np.ndarray, payload_bits: list[int]) -> np.ndarray:
         
     rgb = cv2.cvtColor(cover_bgr, cv2.COLOR_BGR2RGB)
     flat = rgb.flatten().astype(np.int32)
-    n_pixels = len(flat)
+    n = len(payload_bits)
     
-    bit_idx = 0
-    total_bits = len(payload_bits)
-
-    for i in range(0, n_pixels - 1, 2):
-        if bit_idx >= total_bits:
-            break
-
-        p1, p2 = flat[i], flat[i+1]
-        diff = p2 - p1
-        target_bit = payload_bits[bit_idx]
-        
-        current_parity = abs(diff) % 2
-        if current_parity != target_bit:
-            if p2 >= p1:
-                p2 += 1
-            else:
-                p1 += 1
-
-        flat[i] = np.clip(p1, 0, 255)
-        flat[i+1] = np.clip(p2, 0, 255)
-        bit_idx += 1
+    # Vectorized PVD embedding
+    p1 = flat[0 : 2 * n : 2].copy()
+    p2 = flat[1 : 2 * n : 2].copy()
+    diff = p2 - p1
+    target = np.array(payload_bits, dtype=np.int32)
+    current_parity = np.abs(diff) % 2
+    
+    mismatch = current_parity != target
+    p2_inc_mask = mismatch & (diff >= 0)
+    p1_inc_mask = mismatch & (diff < 0)
+    
+    p2[p2_inc_mask] += 1
+    p1[p1_inc_mask] += 1
+    
+    flat[0 : 2 * n : 2] = np.clip(p1, 0, 255)
+    flat[1 : 2 * n : 2] = np.clip(p2, 0, 255)
 
     stego_flat = flat.astype(np.uint8)
     return cv2.cvtColor(stego_flat.reshape(rgb.shape), cv2.COLOR_RGB2BGR)
@@ -65,18 +60,11 @@ def reveal_from_image(stego_bgr: np.ndarray, num_bits: int) -> list[int]:
         
     rgb = cv2.cvtColor(stego_bgr, cv2.COLOR_BGR2RGB)
     flat = rgb.flatten().astype(np.int32)
-    n_pixels = len(flat)
-    extracted_bits: list[int] = []
-
-    for i in range(0, n_pixels - 1, 2):
-        if len(extracted_bits) >= num_bits:
-            break
-
-        p1, p2 = flat[i], flat[i+1]
-        diff = p2 - p1
-        extracted_bits.append(abs(diff) % 2)
-
-    return extracted_bits
+    
+    p1 = flat[0 : 2 * num_bits : 2]
+    p2 = flat[1 : 2 * num_bits : 2]
+    diff = p2 - p1
+    return (np.abs(diff) % 2).tolist()
 
 
 def hide_payload_in_image(
