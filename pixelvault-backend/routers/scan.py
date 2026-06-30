@@ -78,7 +78,8 @@ async def scan_carrier(
             nparr = np.frombuffer(carrier_bytes, np.uint8)
             img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
             if img is not None:
-                flat_pixels = img.flatten()
+                # Limit analysis to a max sample of 500,000 subpixels to prevent Out-Of-Memory (OOM) crashes on Render
+                flat_pixels = img.flatten()[:500000]
                 
                 # Chi-Square & LSB Audit
                 chi_ratio = perform_chi_square_lsb_audit(flat_pixels)
