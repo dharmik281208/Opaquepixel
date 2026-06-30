@@ -148,7 +148,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="md:hidden btn-ghost p-2.5 flex items-center justify-center rounded-full text-white"
+            className="mobile-hamburger-btn md:hidden btn-ghost p-2.5 flex items-center justify-center rounded-full text-white"
             aria-label="Toggle Mobile Menu"
           >
             {mobileMenuOpen ? (
@@ -166,7 +166,7 @@ export default function Header() {
 
       {/* Mobile Glass Backdrop Blur Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-x-4 top-20 z-50 bg-black/85 backdrop-blur-3xl saturate-200 rounded-3xl p-5 shadow-2xl border border-emerald-500/40 animate-fade-up overflow-hidden">
+        <div className="mobile-drawer-menu md:hidden fixed inset-x-4 top-20 z-50 bg-black/85 backdrop-blur-3xl saturate-200 rounded-3xl p-5 shadow-2xl border border-emerald-500/40 animate-fade-up overflow-hidden">
           <nav className="flex flex-col gap-2" aria-label="Main Mobile">
             {authed ? (
               <>
