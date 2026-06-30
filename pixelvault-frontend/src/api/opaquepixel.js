@@ -1,8 +1,9 @@
 import axios from "axios";
 import { getAccessToken, clearAccessToken } from "../utils/auth";
 
+const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://opaquepixel-api.onrender.com/api",
+  baseURL: isLocal ? "http://localhost:8000/api" : "https://opaquepixel-api.onrender.com/api",
   timeout: 120000,
 });
 
