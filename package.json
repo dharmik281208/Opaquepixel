@@ -1,0 +1,14 @@
+{
+  "name": "opaquepixel-root-keep-alive",
+  "version": "1.0.0",
+  "description": "Root PM2 keep-alive service for OpaquePixel Render Backend",
+  "main": "ping.js",
+  "scripts": {
+    "start": "pm2 start ecosystem.config.js",
+    "stop": "pm2 stop ecosystem.config.js",
+    "logs": "pm2 logs"
+  },
+  "dependencies": {
+    "pm2": "^5.3.1"
+  }
+}
