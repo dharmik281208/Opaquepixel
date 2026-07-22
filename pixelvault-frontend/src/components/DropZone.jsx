@@ -12,7 +12,7 @@ export default function DropZone({ label, accept, file, onFile, hint }) {
 
   return (
     <div
-      className={`group rounded-3xl border border-dashed transition-all duration-400 ${
+      className={`group rounded-3xl border border-dashed transition-all duration-500 ${
         dragging
           ? "border-accent-purple/50 bg-accent-purple/5"
           : file
