@@ -830,7 +830,7 @@
   }
 
   .landing-format-badge {
-    @apply w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white transition-all duration-400 cursor-default;
+    @apply w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center text-xs font-bold uppercase tracking-wider text-white transition-all duration-500 cursor-default;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(168, 85, 247, 0.08) 100%);
     border: 1px solid rgba(168, 85, 247, 0.18);
     backdrop-filter: blur(16px);
