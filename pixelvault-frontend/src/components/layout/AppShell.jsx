@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import Logo from "../Logo";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { CursorGlow } from "../ui/CursorGlow";
 import { PixelCipherBg } from "../ui/PixelCipherBg";
@@ -15,6 +16,7 @@ const nav = [
 
 export default function AppShell() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -27,6 +29,7 @@ export default function AppShell() {
   // Scroll to top on route change
   useEffect(() => {
     window.scrollTo(0, 0);
+    setMobileMenuOpen(false);
   }, [location.pathname]);
 
   return (
@@ -38,19 +41,16 @@ export default function AppShell() {
       <header className="sticky top-0 z-50 px-4 pt-4">
         <nav
           className={`mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3 transition-all duration-300 ${
-            scrolled ? "glass shadow-[0_8px_30px_-12px_rgba(34,34,59,0.15)]" : "bg-transparent"
+            scrolled
+              ? "bg-[color:color-mix(in_oklab,var(--card)_90%,var(--background)_10%)] backdrop-blur-xl border border-[color:color-mix(in_oklab,var(--orchid)_25%,transparent)] shadow-[0_10px_35px_-10px_rgba(0,0,0,0.18)]"
+              : "bg-transparent border border-transparent"
           }`}
         >
           <Link to="/" className="flex items-center gap-2.5 group">
-            <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[oklch(0.65_0.10_305)] to-[oklch(0.80_0.03_25)] text-[color:var(--cream)] font-display font-bold shadow-[var(--shadow-soft)] transition-transform group-hover:scale-105">
-              O
-              <span className="absolute inset-0 rounded-lg ring-1 ring-white/30" />
-            </span>
-            <span className="font-display font-semibold tracking-tight text-[color:var(--ink)]">
-              Opaque<span className="text-[color:var(--orchid)]">Pixel</span>
-            </span>
+            <Logo size="sm" showText={true} />
           </Link>
 
+          {/* Desktop Nav Links */}
           <ul className="hidden md:flex items-center gap-1 text-sm">
             {nav.map((n) => (
               <li key={n.to}>
@@ -60,7 +60,7 @@ export default function AppShell() {
                   className={({ isActive }) =>
                     `relative px-3 py-1.5 rounded-full transition-colors ${
                       isActive
-                        ? "text-[color:var(--ink)] bg-[color:color-mix(in_oklab,var(--lilac)_18%,transparent)] font-medium"
+                        ? "text-[color:var(--ink)] bg-[color:color-mix(in_oklab,var(--lilac)_20%,transparent)] font-semibold shadow-sm"
                         : "text-[color:var(--slate)] hover:text-[color:var(--ink)]"
                     }`
                   }
@@ -79,8 +79,58 @@ export default function AppShell() {
             >
               Launch tool →
             </Link>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              className="md:hidden flex items-center justify-center p-2 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] text-[color:var(--ink)] hover:border-[color:var(--orchid)]"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-5 h-5 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
           </div>
         </nav>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-2 mx-auto max-w-6xl rounded-2xl border border-[color:var(--border)] bg-[color:color-mix(in_oklab,var(--card)_95%,var(--background)_5%)] backdrop-blur-2xl p-4 shadow-2xl animate-float-in">
+            <nav className="flex flex-col gap-1.5">
+              {nav.map((n) => (
+                <NavLink
+                  key={n.to}
+                  to={n.to}
+                  end={n.to === "/"}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      isActive
+                        ? "bg-[color:var(--ink)] text-[color:var(--cream)] font-semibold"
+                        : "text-[color:var(--slate)] hover:text-[color:var(--ink)] hover:bg-[color:var(--muted)]"
+                    }`
+                  }
+                >
+                  {n.label}
+                </NavLink>
+              ))}
+              <Link
+                to="/hide"
+                onClick={() => setMobileMenuOpen(false)}
+                className="mt-2 text-center rounded-xl bg-[color:var(--orchid)] px-4 py-2.5 text-sm font-semibold text-white shadow-md"
+              >
+                Launch tool →
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}
@@ -90,9 +140,7 @@ export default function AppShell() {
       <footer className="mt-24 border-t border-[color:var(--border)] bg-[color:color-mix(in_oklab,var(--background)_82%,var(--lilac)_6%)] backdrop-blur-sm">
         <div className="mx-auto max-w-6xl px-6 py-12 grid gap-10 md:grid-cols-3">
           <div>
-            <div className="font-display text-lg font-semibold text-[color:var(--ink)]">
-              Opaque<span className="text-[color:var(--orchid)]">Pixel</span>
-            </div>
+            <Logo size="sm" showText={true} />
             <p className="mt-3 text-sm text-[color:var(--slate)] max-w-xs">
               Encrypted steganography for research, education, and lawful privacy.
             </p>

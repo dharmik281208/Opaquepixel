@@ -1,26 +1,30 @@
 const PIXELS = [
-  [5, 5, 1], [13, 5, 0.25], [21, 5, 0.55], [5, 13, 0.35],
-  [13, 13, 1], [21, 13, 0.2], [5, 21, 0.65], [13, 21, 0.3], [21, 21, 1],
+  [5, 5, 1],
+  [13, 5, 0.35],
+  [21, 5, 0.65],
+  [5, 13, 0.45],
+  [13, 13, 1],
+  [21, 13, 0.3],
+  [5, 21, 0.75],
+  [13, 21, 0.4],
+  [21, 21, 1],
 ];
 
 export default function Logo({ size = "md", showText = true, animate = true, className = "" }) {
   const sizes = {
-    sm: { box: "w-11 h-11", title: "text-base", sub: "text-[10px]" },
-    md: { box: "w-13 h-13", title: "text-lg", sub: "text-xs" },
-    lg: { box: "w-16 h-16", title: "text-2xl", sub: "text-xs" },
-    hero: { box: "w-20 h-20", title: "text-3xl", sub: "text-sm" },
+    sm: { box: "w-8 h-8", title: "text-base", sub: "text-[10px]" },
+    md: { box: "w-9 h-9", title: "text-lg", sub: "text-xs" },
+    lg: { box: "w-11 h-11", title: "text-xl", sub: "text-xs" },
+    hero: { box: "w-14 h-14", title: "text-3xl", sub: "text-sm" },
   };
   const s = sizes[size] || sizes.md;
 
   return (
-    <div className={`inline-flex items-center gap-3.5 ${animate ? "logo-wrap" : ""} ${className}`}>
+    <div className={`inline-flex items-center gap-2.5 ${className}`}>
       <div
-        className={`${s.box} logo-box glass rounded-2xl flex items-center justify-center overflow-hidden shrink-0 relative ${
-          animate ? "logo-box-animated" : ""
-        }`}
+        className={`${s.box} rounded-xl bg-gradient-to-br from-[color:var(--orchid)] via-[color:var(--lilac)] to-[color:var(--warm)] p-1.5 flex items-center justify-center overflow-hidden shrink-0 relative shadow-[var(--shadow-soft)] transition-transform hover:scale-105`}
       >
-        {animate && <div className="logo-shimmer" aria-hidden />}
-        <svg viewBox="0 0 32 32" className="relative z-[1] w-[60%] h-[60%]" fill="none">
+        <svg viewBox="0 0 32 32" className="relative z-[1] w-full h-full" fill="none">
           {PIXELS.map(([x, y, o], i) => (
             <rect
               key={i}
@@ -29,26 +33,20 @@ export default function Logo({ size = "md", showText = true, animate = true, cla
               width="6"
               height="6"
               rx="1.5"
-              fill="#a855f7"
-              className={animate ? "logo-pixel" : ""}
+              fill="#ffffff"
+              className={animate ? "animate-pulse" : ""}
               style={{
                 fillOpacity: o,
                 animationDelay: animate ? `${i * 0.15}s` : undefined,
-                "--pixel-base": o,
               }}
             />
           ))}
         </svg>
       </div>
       {showText && (
-        <div className={`leading-none ${animate ? "logo-text-group" : ""}`}>
-          <span className={`font-display font-bold ${s.title} logo-title-text block`}>
-            Opaque
-          </span>
-          <span className={`block font-display font-medium tracking-[0.3em] ${s.sub} logo-sub-text mt-1`}>
-            PIXEL
-          </span>
-        </div>
+        <span className="font-display font-semibold tracking-tight text-[color:var(--ink)]">
+          Opaque<span className="text-[color:var(--orchid)]">Pixel</span>
+        </span>
       )}
     </div>
   );
