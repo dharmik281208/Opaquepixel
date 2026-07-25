@@ -15,16 +15,8 @@ const nav = [
 ];
 
 export default function AppShell() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Scroll to top on route change
   useEffect(() => {
@@ -40,11 +32,7 @@ export default function AppShell() {
       {/* Header Navigation */}
       <header className="sticky top-0 z-50 px-4 pt-4">
         <nav
-          className={`mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3 transition-all duration-300 ${
-            scrolled
-              ? "bg-[color:color-mix(in_oklab,var(--card)_90%,var(--background)_10%)] backdrop-blur-xl border border-[color:color-mix(in_oklab,var(--orchid)_25%,transparent)] shadow-[0_10px_35px_-10px_rgba(0,0,0,0.18)]"
-              : "bg-transparent border border-transparent"
-          }`}
+          className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-5 py-3 glass bg-[color:color-mix(in_oklab,var(--card)_85%,transparent)] backdrop-blur-xl border border-[color:color-mix(in_oklab,var(--lilac)_22%,transparent)] shadow-[0_8px_30px_-12px_rgba(34,34,59,0.15)] transition-all duration-300"
         >
           <Link to="/" className="flex items-center gap-2.5 group">
             <Logo size="sm" showText={true} />
