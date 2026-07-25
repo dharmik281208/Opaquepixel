@@ -25,28 +25,54 @@ export function generateForensicPDF(reportData) {
     { key: "Anomalous Block Count", value: String(reportData.anomalousBlocks || 0) },
   ];
 
-  const printWindow = window.open("", "_blank", "width=850,height=950");
-  if (!printWindow) {
-    alert("Please allow popups to generate and print the PDF report.");
-    return;
-  }
-
   const isHighRisk = threatScore > 50;
-  const statusColor = isHighRisk ? "#ef4444" : "#10b981";
+  const statusColor = isHighRisk ? "#dc2626" : "#059669";
+  const statusBg = isHighRisk ? "#fef2f2" : "#ecfdf5";
   const statusText = isHighRisk ? "HIGH STENOGRAPHIC ANOMALY DETECTED" : "CLEAN MEDIA CARRIER DETECTED";
 
   const html = `<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>OpaquePixel Forensic Scan Report - ${fileName}</title>
+    <title>OpaquePixel Forensic Report - ${fileName}</title>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
       body {
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         color: #0f172a;
         background: #ffffff;
         margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .no-print-bar {
+        background: #1e1b4b;
+        color: #ffffff;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      .no-print-bar button {
+        background: #9f86c0;
+        color: #ffffff;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .no-print-bar button:hover {
+        background: #8b5cf6;
+      }
+      .report-container {
+        max-w: 800px;
+        margin: 0 auto;
         padding: 40px;
       }
       .header {
@@ -54,14 +80,13 @@ export function generateForensicPDF(reportData) {
         justify-content: space-between;
         align-items: center;
         border-bottom: 2px solid #e2e8f0;
-        padding-bottom: 20px;
+        padding-bottom: 24px;
         margin-bottom: 30px;
       }
       .brand {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 26px;
-        font-weight: 700;
-        letter-spacing: -0.02em;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
         color: #0f172a;
       }
       .brand span { color: #9f86c0; }
@@ -73,8 +98,9 @@ export function generateForensicPDF(reportData) {
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        color: #ffffff;
-        background: ${statusColor};
+        color: ${statusColor};
+        background: ${statusBg};
+        border: 1px solid ${statusColor};
       }
       .grid {
         display: grid;
@@ -102,11 +128,10 @@ export function generateForensicPDF(reportData) {
         color: #0f172a;
       }
       .section-title {
-        font-family: 'Space Grotesk', sans-serif;
         font-size: 16px;
         font-weight: 700;
-        margin-top: 30px;
-        margin-bottom: 15px;
+        margin-top: 32px;
+        margin-bottom: 16px;
         border-bottom: 1px solid #e2e8f0;
         padding-bottom: 8px;
         color: #0f172a;
@@ -118,120 +143,153 @@ export function generateForensicPDF(reportData) {
       }
       th, td {
         text-align: left;
-        padding: 12px;
+        padding: 12px 14px;
         border-bottom: 1px solid #e2e8f0;
         font-size: 13px;
       }
       th {
         background: #f1f5f9;
-        font-weight: 600;
+        font-weight: 700;
         color: #475569;
         text-transform: uppercase;
         font-size: 11px;
         letter-spacing: 0.05em;
       }
       .footer {
-        margin-top: 40px;
+        margin-top: 48px;
         text-align: center;
         font-size: 11px;
         color: #94a3b8;
         border-top: 1px solid #e2e8f0;
-        padding-top: 20px;
+        padding-top: 24px;
       }
       @media print {
-        body { padding: 0; }
+        .no-print-bar { display: none !important; }
+        .report-container { padding: 0; }
       }
     </style>
   </head>
   <body>
-    <div class="header">
+    <div class="no-print-bar">
+      <div>🔒 <strong>OpaquePixel Forensic Report Preview</strong></div>
       <div>
-        <div class="brand">Opaque<span>Pixel</span></div>
-        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Steganographic Forensic Analysis Report</div>
-      </div>
-      <div class="badge">${statusText}</div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <div class="card-title">Target File Name</div>
-        <div class="card-value" style="font-size: 15px; word-break: break-all;">${fileName}</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Steganographic Threat Score</div>
-        <div class="card-value" style="color: ${statusColor};">${threatScore}%</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Carrier Media Type</div>
-        <div class="card-value">${String(carrierType).toUpperCase()} (${fileSize})</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Scan Timestamp</div>
-        <div class="card-value" style="font-size: 14px;">${scanTime}</div>
+        <button onclick="window.print()">Print / Save as PDF 🖨️</button>
+        <button onclick="window.close()" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); margin-left: 8px;">Close</button>
       </div>
     </div>
 
-    <div class="section-title">Multi-Algorithm Forensic Audit</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Inspection Stage / Algorithm</th>
-          <th>Status</th>
-          <th>Confidence</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${algorithms
-          .map(
-            (algo) => `
-          <tr>
-            <td><strong>${algo.name}</strong><br><span style="font-size: 12px; color: #64748b;">${algo.desc}</span></td>
-            <td><span style="color: ${algo.passed ? "#10b981" : "#ef4444"}; font-weight: 700;">${algo.status}</span></td>
-            <td>${algo.score}%</td>
-          </tr>
-        `,
-          )
-          .join("")}
-      </tbody>
-    </table>
+    <div class="report-container">
+      <div class="header">
+        <div>
+          <div class="brand">Opaque<span>Pixel</span></div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px; font-weight: 500;">Multi-Algorithm Steganography Forensic Report</div>
+        </div>
+        <div class="badge">${statusText}</div>
+      </div>
 
-    <div class="section-title">Container Metadata & Statistical Audit</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Property Metric</th>
-          <th>Inspection Result</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${metadata
-          .map(
-            (item) => `
-          <tr>
-            <td><strong>${item.key}</strong></td>
-            <td>${item.value}</td>
-          </tr>
-        `,
-          )
-          .join("")}
-      </tbody>
-    </table>
+      <div class="grid">
+        <div class="card">
+          <div class="card-title">Target File Name</div>
+          <div class="card-value" style="font-size: 15px; word-break: break-all;">${fileName}</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Steganographic Threat Score</div>
+          <div class="card-value" style="color: ${statusColor};">${threatScore}%</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Carrier Media Type</div>
+          <div class="card-value">${String(carrierType).toUpperCase()} (${fileSize})</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Scan Timestamp</div>
+          <div class="card-value" style="font-size: 14px;">${scanTime}</div>
+        </div>
+      </div>
 
-    <div class="footer">
-      Generated automatically by OpaquePixel Steganography Intelligence Engine &middot; ${new Date().toLocaleDateString()}
+      <div class="section-title">Multi-Algorithm Forensic Audit Breakdown</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Inspection Stage / Algorithm</th>
+            <th>Status</th>
+            <th>Confidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${algorithms
+            .map(
+              (algo) => `
+            <tr>
+              <td><strong>${algo.name}</strong><br><span style="font-size: 12px; color: #64748b;">${algo.desc}</span></td>
+              <td><span style="color: ${algo.passed ? "#059669" : "#dc2626"}; font-weight: 700;">${algo.status}</span></td>
+              <td><strong>${algo.score}%</strong></td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+
+      <div class="section-title">Container Metadata & Statistical Metrics</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Property Metric</th>
+            <th>Inspection Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${metadata
+            .map(
+              (item) => `
+            <tr>
+              <td><strong>${item.key}</strong></td>
+              <td>${item.value}</td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+
+      <div class="footer">
+        Generated automatically by OpaquePixel Steganography Intelligence Engine &middot; ${new Date().toLocaleDateString()}
+      </div>
     </div>
 
     <script>
-      window.onload = function() {
-        setTimeout(function() {
-          window.print();
-        }, 300);
-      };
+      setTimeout(function() {
+        window.print();
+      }, 400);
     </script>
   </body>
 </html>`;
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+  const printWindow = window.open("", "_blank", "width=900,height=950");
+  if (printWindow) {
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+  } else {
+    // Popup fallback using hidden iframe
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    }, 500);
+  }
 }
