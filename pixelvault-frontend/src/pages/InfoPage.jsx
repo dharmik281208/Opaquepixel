@@ -22,13 +22,6 @@ export default function InfoPage() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden px-6 pt-16 md:pt-24 pb-20">
-        <div
-          className="pointer-events-none absolute inset-0 -z-10 opacity-70"
-          style={{
-            background:
-              "radial-gradient(60% 50% at 20% 20%, color-mix(in oklab, var(--lilac) 25%, transparent), transparent), radial-gradient(50% 40% at 85% 10%, color-mix(in oklab, var(--warm) 35%, transparent), transparent)",
-          }}
-        />
         <div className="mx-auto max-w-6xl grid gap-10 md:grid-cols-[1.2fr_1fr] items-center">
           <div className="animate-float-in">
             <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--card)]/70 px-3 py-1 text-xs text-[color:var(--slate)]">

@@ -134,7 +134,7 @@ export function PixelCipherBg() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(70% 55% at 12% 0%, color-mix(in oklab, var(--lilac) 22%, transparent), transparent 70%), radial-gradient(55% 45% at 92% 8%, color-mix(in oklab, var(--warm) 26%, transparent), transparent 70%), radial-gradient(60% 50% at 50% 105%, color-mix(in oklab, var(--orchid) 16%, transparent), transparent 70%)",
+            "radial-gradient(70% 40% at 50% 0%, color-mix(in oklab, var(--lilac) 10%, transparent), transparent 70%), radial-gradient(60% 50% at 50% 100%, color-mix(in oklab, var(--orchid) 12%, transparent), transparent 70%)",
         }}
       />
       <canvas ref={ref} className="absolute inset-0 h-full w-full" />
