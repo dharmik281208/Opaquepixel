@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 function textToBits(text) {
   const bytes = new TextEncoder().encode(text);
@@ -414,9 +415,42 @@ export function PipelineOrbit() {
   );
 }
 
-/* 6. Static clear email card — contact page */
+/* 6. Interactive Cipher signature with Eye toggle & copy button — contact page */
+const CIPHER_CHARS = "01#%&*<>/\\{}[]?$@";
+
 export function CipherSignature({ text = "dhrmiksuhagiya@gmail.com" }) {
+  const [display, setDisplay] = useState(text);
+  const [revealed, setRevealed] = useState(0);
+  const [revealMode, setRevealMode] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (revealMode) {
+      setDisplay(text);
+      return;
+    }
+
+    let frame = 0;
+    const id = window.setInterval(() => {
+      frame++;
+      const r = Math.min(text.length, Math.floor(frame / 2));
+      setRevealed(r);
+      setDisplay(
+        text
+          .split("")
+          .map((ch, i) =>
+            i < r || ch === " " || ch === "@" || ch === "."
+              ? ch
+              : CIPHER_CHARS[Math.floor(Math.random() * CIPHER_CHARS.length)],
+          )
+          .join(""),
+      );
+      if (r >= text.length) {
+        frame = -30;
+      }
+    }, 55);
+    return () => window.clearInterval(id);
+  }, [text, revealMode]);
 
   const handleCopy = () => {
     try {
@@ -429,28 +463,68 @@ export function CipherSignature({ text = "dhrmiksuhagiya@gmail.com" }) {
   };
 
   return (
-    <VisualFrame eyebrow="Contact Email" title="Direct Communication Channel" hint="Click to send or copy">
+    <VisualFrame
+      eyebrow="Cipher"
+      title="Decrypting channel"
+      hint={revealMode ? "Email Unlocked" : "Click Eye to reveal full email"}
+    >
       <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--muted)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <a
-            href={`mailto:${text}`}
-            className="font-mono text-base md:text-lg font-bold tracking-tight text-[color:var(--orchid)] hover:underline break-all"
-          >
-            {text}
-          </a>
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1.5 text-xs font-medium text-[color:var(--ink)] hover:border-[color:var(--orchid)] transition-all cursor-pointer"
-          >
-            {copied ? "Copied! ✓" : "Copy Email"}
-          </button>
+          {revealMode ? (
+            <a
+              href={`mailto:${text}`}
+              className="font-mono text-base md:text-lg font-bold tracking-tight text-[color:var(--orchid)] hover:underline break-all"
+            >
+              {text}
+            </a>
+          ) : (
+            <div className="font-mono text-lg tracking-tight text-[color:var(--ink)] break-all">
+              {display}
+            </div>
+          )}
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setRevealMode((prev) => !prev)}
+              aria-label={revealMode ? "Hide cipher" : "Reveal full email"}
+              title={revealMode ? "Hide cipher" : "Reveal full email"}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1.5 text-xs font-medium text-[color:var(--ink)] hover:border-[color:var(--orchid)] transition-all cursor-pointer shadow-sm"
+            >
+              {revealMode ? (
+                <>
+                  <EyeOff className="w-4 h-4 text-[color:var(--orchid)]" />
+                  <span>Cipher</span>
+                </>
+              ) : (
+                <>
+                  <Eye className="w-4 h-4 text-[color:var(--orchid)]" />
+                  <span>Reveal</span>
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[color:var(--border)] bg-[color:var(--card)] px-3 py-1.5 text-xs font-medium text-[color:var(--ink)] hover:border-[color:var(--orchid)] transition-all cursor-pointer shadow-sm"
+            >
+              {copied ? "Copied! ✓" : "Copy"}
+            </button>
+          </div>
         </div>
-        <div className="mt-3 flex items-center justify-between text-[11px] text-[color:var(--slate)] border-t border-[color:var(--border)] pt-3">
-          <span>AES-256-GCM Channel</span>
+
+        <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-[color:var(--border)]">
+          <div
+            className="h-full rounded-full bg-[color:var(--orchid)] transition-all duration-100"
+            style={{ width: revealMode ? "100%" : `${(revealed / text.length) * 100}%` }}
+          />
+        </div>
+        <div className="mt-2 flex items-center justify-between text-[11px] text-[color:var(--slate)]">
+          <span>{revealMode ? "Decrypted Plaintext Stream" : "AES-256-GCM cipher stream"}</span>
           <span className="text-emerald-500 font-semibold flex items-center gap-1">
             <span className="h-2 w-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-            Active Channel
+            {revealMode ? "Unlocked" : "Live Scramble"}
           </span>
         </div>
       </div>
