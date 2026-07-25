@@ -93,11 +93,11 @@ export default function HideEncryptStep({ password, onChange }) {
               <div
                 key={key}
                 className={`flex items-center gap-2 transition-colors duration-200 ${
-                  met ? "text-emerald-400 font-medium" : "text-surface-muted"
+                  met ? "text-purple-400 font-medium" : "text-surface-muted"
                 }`}
               >
                 <span className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] ${
-                  met ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-white/5 text-surface-muted border border-white/10"
+                  met ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "bg-white/5 text-surface-muted border border-white/10"
                 }`}>
                   {met ? "✓" : "•"}
                 </span>

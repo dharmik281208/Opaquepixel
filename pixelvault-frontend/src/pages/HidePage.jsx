@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import DropZone from "../components/DropZone";
-import GlassCard from "../components/GlassCard";
-import ModeSelector from "../components/ModeSelector";
-import CarrierTypeSelector from "../components/CarrierTypeSelector";
-import AlgorithmSelector from "../components/AlgorithmSelector";
-import CapacityBar from "../components/CapacityBar";
-import HideEncryptStep from "../components/HideEncryptStep";
-import ResultCard from "../components/ResultCard";
 import Toast from "../components/Toast";
-import WhatsAppCompressionNotice from "../components/WhatsAppCompressionNotice";
-import PageHero from "../components/ui/PageHero";
+import CapacityBar from "../components/CapacityBar";
+import ResultCard from "../components/ResultCard";
+import { PixelEmbedGrid } from "../components/ui/StegoVisuals";
+import {
+  Panel,
+  SectionHeader,
+  OptionGroup,
+  PasswordField,
+  PrimaryButton,
+  WhatsAppWarning,
+  Chip,
+  CARRIERS,
+  ALGORITHMS,
+} from "../components/ui/ToolPrimitives";
 import { hidePayload } from "../api/opaquepixel";
 import { validatePassword } from "../utils/passwordValidator";
 import {
@@ -20,6 +25,14 @@ import {
   getStegoFilename,
   estimateCarrierCapacity,
 } from "../utils/mimeTypes";
+
+const PAYLOADS = [
+  { value: "text", label: "Text" },
+  { value: "doc", label: "Doc" },
+  { value: "photo", label: "Photo" },
+  { value: "video", label: "Video" },
+  { value: "audio", label: "Audio" },
+];
 
 export default function HidePage() {
   const [carrierType, setCarrierType] = useState("image");
@@ -75,12 +88,14 @@ export default function HidePage() {
           : "PDF, DOCX, PPTX, ODT, RTF, TXT…";
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!carrier) return setToast({ message: "Upload a carrier", type: "error" });
+    if (e) e.preventDefault();
+    if (!carrier) return setToast({ message: "Please upload a carrier file", type: "error" });
     const pwdError = validatePassword(password);
     if (pwdError) return setToast({ message: pwdError, type: "error" });
-    if (payloadMode === "text" && !payloadText.trim()) return setToast({ message: "Enter message", type: "error" });
-    if (payloadMode !== "text" && !payloadFile) return setToast({ message: "Upload payload", type: "error" });
+    if (payloadMode === "text" && !payloadText.trim())
+      return setToast({ message: "Please enter a secret message", type: "error" });
+    if (payloadMode !== "text" && !payloadFile)
+      return setToast({ message: "Please upload a payload file", type: "error" });
 
     setLoading(true);
     try {
@@ -94,120 +109,175 @@ export default function HidePage() {
         stegoMethod,
       });
       setResult({ blob, filename: getStegoFilename(carrierType, carrier) });
-      setToast({ message: "Done", type: "success" });
+      setToast({ message: "Payload successfully hidden into carrier file!", type: "success" });
     } catch (err) {
-      let msg = "Failed";
+      let msg = "Failed to embed payload";
       if (err.response?.data instanceof Blob) {
         try {
           const text = await err.response.data.text();
-          const json = JSON.parse(text);
-          msg = json.detail || msg;
+          const parsed = JSON.parse(text);
+          if (parsed.detail) msg = parsed.detail;
         } catch {
-          msg = err.message || msg;
+          /* ignore */
         }
-      } else {
-        msg = err.response?.data?.detail || err.message || msg;
+      } else if (err.response?.data?.detail) {
+        msg = err.response.data.detail;
       }
-      setToast({ message: typeof msg === "string" ? msg : "Failed", type: "error" });
+      setToast({ message: msg, type: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCarrierChange = (file) => {
-    if (file && file.size > 10 * 1024 * 1024) {
-      setToast({
-        message: "Warning: Carrier files >10MB can trigger Render proxy timeouts. Consider using a smaller image.",
-        type: "warning"
-      });
-    }
-    setCarrier(file);
-  };
-
-  const handlePayloadFileChange = (file) => {
-    if (file && file.size > 5 * 1024 * 1024) {
-      setToast({
-        message: "Warning: Payloads >5MB can trigger Render proxy timeouts. Consider using a smaller file.",
-        type: "warning"
-      });
-    }
-    setPayloadFile(file);
-  };
-
-  const reset = () => {
-    setResult(null);
-    setCarrier(null);
-    setPayloadFile(null);
-    setPayloadText("");
-    setPassword("");
-  };
-
-  if (result) {
-    return (
-      <>
-        <ResultCard blob={result.blob} filename={result.filename} onReset={reset} />
-        <Toast message={toast?.message} type={toast?.type} onClose={() => setToast(null)} />
-      </>
-    );
-  }
-
   return (
-    <div className="page-stack workspace-page">
-      <PageHero
-        tag="Workspace"
-        title="Hide"
-        lead="Embed encrypted data inside a carrier file."
-      />
+    <div className="px-6 py-12">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      <div className="mx-auto max-w-4xl">
+        <header className="mb-10">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--orchid)]">
+            Hide
+          </div>
+          <h1 className="mt-2 text-4xl md:text-5xl font-display font-semibold text-[color:var(--ink)]">
+            Encrypt &amp; embed a payload
+          </h1>
+          <p className="mt-2 text-[color:var(--slate)]">
+            Choose a carrier, drop your payload, seal it with AES-256-GCM.
+          </p>
+        </header>
 
-      <form onSubmit={handleSubmit} className="card-stack">
-        <GlassCard className="opacity-0 animate-fade-up delay-1 card-inner">
-          <div className="step-block">
-            <span className="section-tag">Step 01</span>
-            <h2 className="step-title">Carrier</h2>
-            <CarrierTypeSelector
+        <div className="mb-8">
+          <PixelEmbedGrid seed="hide" />
+        </div>
+
+        <form onSubmit={handleSubmit} className="grid gap-6">
+          <Panel>
+            <SectionHeader step="Step 01" title="Carrier" />
+            <OptionGroup
+              label="Carrier type"
               value={carrierType}
-              onChange={(id) => {
-                setCarrierType(id);
+              onChange={handleCarrierTypeChange}
+              options={CARRIERS}
+            />
+
+            <div className="mt-6">
+              <WhatsAppWarning />
+            </div>
+
+            <div className="mt-6">
+              <DropZone
+                label="Upload carrier"
+                hint={carrierHint}
+                accept={carrierAccept}
+                file={carrier}
+                onFile={setCarrier}
+              />
+            </div>
+
+            <div className="mt-6">
+              <OptionGroup
+                label="Algorithm"
+                value={stegoMethod}
+                onChange={setStegoMethod}
+                options={ALGORITHMS}
+              />
+            </div>
+          </Panel>
+
+          <Panel>
+            <SectionHeader step="Step 02" title="Payload" />
+            <OptionGroup
+              label="Payload type"
+              value={payloadMode}
+              onChange={(v) => {
+                setPayloadMode(v);
+                setPayloadFile(null);
+                setPayloadText("");
+              }}
+              options={PAYLOADS}
+            />
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              <Chip tone="accent">Algorithm · AES-256-GCM</Chip>
+              <Chip tone="accent">KDF · PBKDF2 · 600k</Chip>
+              <Chip tone="accent">Mode · Authenticated</Chip>
+            </div>
+
+            {payloadMode === "text" ? (
+              <div className="mt-6">
+                <label className="text-xs font-semibold uppercase tracking-widest text-[color:var(--dusk)]">
+                  Message
+                </label>
+                <textarea
+                  rows={4}
+                  value={payloadText}
+                  onChange={(e) => setPayloadText(e.target.value)}
+                  placeholder="Type the secret to hide…"
+                  className="mt-2 w-full resize-none rounded-xl border border-[color:var(--input)] bg-[color:var(--card)] px-4 py-3 text-sm text-[color:var(--ink)] outline-none focus:border-[color:var(--orchid)] focus:ring-4 focus:ring-[color:color-mix(in_oklab,var(--lilac)_25%,transparent)]"
+                />
+              </div>
+            ) : (
+              <div className="mt-6">
+                <DropZone
+                  label="Upload payload file"
+                  accept={PAYLOAD_ACCEPT[payloadMode]}
+                  file={payloadFile}
+                  onFile={setPayloadFile}
+                />
+              </div>
+            )}
+
+            {carrier && (
+              <div className="mt-6">
+                <CapacityBar
+                  capacity={capacity}
+                  used={payloadSize}
+                  loading={capacityLoading}
+                />
+              </div>
+            )}
+
+            <div className="mt-6">
+              <PasswordField
+                label="Encryption password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Protected"
+              />
+              <ul className="mt-3 grid grid-cols-2 gap-1.5 text-xs text-[color:var(--slate)]">
+                <li>• At least 8 characters</li>
+                <li>• 1 uppercase letter (A-Z)</li>
+                <li>• 1 lowercase letter (a-z)</li>
+                <li>• 1 number (0-9)</li>
+                <li>• 1 special character (!@#…)</li>
+              </ul>
+              <p className="mt-3 text-xs text-[color:var(--slate)]">
+                Use a unique password. It is never stored — if you lose it, the hidden data cannot be recovered.
+              </p>
+            </div>
+          </Panel>
+
+          {result && (
+            <ResultCard
+              title="Stego carrier generated successfully!"
+              blob={result.blob}
+              filename={result.filename}
+              onReset={() => {
+                setResult(null);
                 setCarrier(null);
+                setPayloadFile(null);
+                setPayloadText("");
+                setPassword("");
               }}
             />
-          </div>
-          {(carrierType === "image" || carrierType === "video") && (
-            <WhatsAppCompressionNotice compact />
           )}
-          <DropZone label={`Upload ${carrierType}`} accept={carrierAccept} file={carrier} onFile={handleCarrierChange} hint={carrierHint} />
-          <AlgorithmSelector value={stegoMethod} onChange={setStegoMethod} disabled={carrierType !== "image"} />
-        </GlassCard>
 
-        <GlassCard className="opacity-0 animate-fade-up delay-2 card-inner">
-          <div className="step-block">
-            <span className="section-tag">Step 02</span>
-            <h2 className="step-title">Payload</h2>
-            <ModeSelector value={payloadMode} onChange={setPayloadMode} />
+          <div className="flex justify-end">
+            <PrimaryButton type="submit" disabled={loading}>
+              {loading ? "Encrypting & Embedding…" : "Hide payload"}
+            </PrimaryButton>
           </div>
-          {payloadMode === "text" ? (
-            <textarea
-              value={payloadText}
-              onChange={(e) => setPayloadText(e.target.value)}
-              placeholder="Secret message…"
-              rows={4}
-              className="input-field resize-none font-mono text-xs"
-              maxLength={100000}
-            />
-          ) : (
-            <DropZone label="Upload payload" accept={PAYLOAD_ACCEPT[payloadMode]} file={payloadFile} onFile={handlePayloadFileChange} />
-          )}
-          <CapacityBar payloadSize={payloadSize} capacity={capacity} loading={capacityLoading} />
-        </GlassCard>
-
-        <HideEncryptStep password={password} onChange={setPassword} />
-
-        <button type="submit" disabled={loading} className="btn-primary w-full opacity-0 animate-fade-up delay-4">
-          {loading ? "Processing…" : "Hide payload →"}
-        </button>
-      </form>
-
-      <Toast message={toast?.message} type={toast?.type} onClose={() => setToast(null)} />
+        </form>
+      </div>
     </div>
   );
 }

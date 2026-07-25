@@ -1,13 +1,18 @@
 import { useState } from "react";
 import DropZone from "../components/DropZone";
-import GlassCard from "../components/GlassCard";
-import CarrierTypeSelector from "../components/CarrierTypeSelector";
-import AlgorithmSelector from "../components/AlgorithmSelector";
-import PasswordField from "../components/PasswordField";
-import ResultCard from "../components/ResultCard";
 import Toast from "../components/Toast";
-import WhatsAppCompressionNotice from "../components/WhatsAppCompressionNotice";
-import PageHero from "../components/ui/PageHero";
+import ResultCard from "../components/ResultCard";
+import { RevealScope } from "../components/ui/StegoVisuals";
+import {
+  Panel,
+  SectionHeader,
+  OptionGroup,
+  PasswordField,
+  PrimaryButton,
+  WhatsAppWarning,
+  CARRIERS,
+  ALGORITHMS,
+} from "../components/ui/ToolPrimitives";
 import { revealPayload } from "../api/opaquepixel";
 import { validatePassword } from "../utils/passwordValidator";
 import { CARRIER_DOCUMENT_ACCEPT, CARRIER_AUDIO_ACCEPT } from "../utils/mimeTypes";
@@ -36,9 +41,19 @@ export default function RevealPage() {
     setStegoMethod(id === "image" ? "auto" : "");
   };
 
+  const handleCarrierChange = (file) => {
+    if (file && file.size > 10 * 1024 * 1024) {
+      setToast({
+        message: "Warning: Stego files >10MB can trigger proxy timeouts. Consider using a smaller file.",
+        type: "warning",
+      });
+    }
+    setCarrier(file);
+  };
+
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!carrier) return setToast({ message: "Upload stego file", type: "error" });
+    if (e) e.preventDefault();
+    if (!carrier) return setToast({ message: "Please upload a stego file", type: "error" });
     const pwdError = validatePassword(password);
     if (pwdError) return setToast({ message: pwdError, type: "error" });
 
@@ -51,84 +66,93 @@ export default function RevealPage() {
         stegoMethod: stegoMethod || undefined,
       });
       setResult(data);
-      setToast({ message: "Revealed", type: "success" });
+      setToast({ message: "Hidden payload revealed successfully!", type: "success" });
     } catch (err) {
-      const detail = err.response?.data?.detail || err.message || "Failed";
-      setToast({ message: typeof detail === "string" ? detail : "Failed", type: "error" });
+      const detail = err.response?.data?.detail || err.message || "Failed to reveal payload";
+      setToast({ message: typeof detail === "string" ? detail : "Failed to reveal payload", type: "error" });
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCarrierChange = (file) => {
-    if (file && file.size > 10 * 1024 * 1024) {
-      setToast({
-        message: "Warning: Stego files >10MB can trigger Render proxy timeouts. Consider using a smaller file.",
-        type: "warning"
-      });
-    }
-    setCarrier(file);
   };
 
   const reset = () => {
     setResult(null);
     setCarrier(null);
     setPassword("");
-    setStegoMethod("");
+    setStegoMethod("auto");
   };
 
-  if (result) {
-    return (
-      <>
-        <ResultCard result={result} onReset={reset} mode="reveal" />
-        <Toast message={toast?.message} type={toast?.type} onClose={() => setToast(null)} />
-      </>
-    );
-  }
-
   return (
-    <div className="page-stack workspace-page">
-      <PageHero
-        tag="Workspace"
-        title="Reveal"
-        lead="Extract hidden data from a stego carrier."
-      />
-
-      <form onSubmit={handleSubmit} className="card-stack">
-        <GlassCard className="opacity-0 animate-fade-up delay-1 card-inner">
-          <div className="step-block">
-            <span className="section-tag">Step 01</span>
-            <h2 className="step-title">Carrier</h2>
-            <CarrierTypeSelector value={carrierType} onChange={handleCarrierTypeChange} />
+    <div className="px-6 py-12">
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      <div className="mx-auto max-w-4xl">
+        <header className="mb-10">
+          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--orchid)]">
+            Reveal
           </div>
+          <h1 className="mt-2 text-4xl md:text-5xl font-display font-semibold text-[color:var(--ink)]">
+            Decrypt hidden payload
+          </h1>
+          <p className="mt-2 text-[color:var(--slate)]">
+            Provide the stego file and the password used to seal it.
+          </p>
+        </header>
 
-          {(carrierType === "image" || carrierType === "video") && (
-            <WhatsAppCompressionNotice compact />
-          )}
+        <div className="mb-8">
+          <RevealScope />
+        </div>
 
-          <DropZone label="Upload stego file" accept={carrierAccept} file={carrier} onFile={handleCarrierChange} />
+        {result ? (
+          <ResultCard result={result} onReset={reset} mode="reveal" />
+        ) : (
+          <form onSubmit={handleSubmit} className="grid gap-6">
+            <Panel>
+              <SectionHeader step="Step 01" title="Carrier" />
+              <OptionGroup
+                label="Carrier type"
+                value={carrierType}
+                onChange={handleCarrierTypeChange}
+                options={CARRIERS}
+              />
+              <div className="mt-6">
+                <WhatsAppWarning />
+              </div>
+              <div className="mt-6">
+                <DropZone
+                  label="Upload stego file"
+                  hint="Drop or click to browse"
+                  accept={carrierAccept}
+                  file={carrier}
+                  onFile={handleCarrierChange}
+                />
+              </div>
+              <div className="mt-6">
+                <OptionGroup
+                  label="Algorithm"
+                  value={stegoMethod}
+                  onChange={setStegoMethod}
+                  options={ALGORITHMS}
+                />
+              </div>
+            </Panel>
 
-          <AlgorithmSelector
-            value={stegoMethod}
-            onChange={setStegoMethod}
-            disabled={carrierType !== "image"}
-          />
-        </GlassCard>
+            <Panel>
+              <SectionHeader step="Step 02" title="Decrypt" />
+              <PasswordField
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter the encryption password"
+              />
+            </Panel>
 
-        <GlassCard className="opacity-0 animate-fade-up delay-2 card-inner">
-          <div className="step-block">
-            <span className="section-tag">Step 02</span>
-            <h2 className="step-title">Decrypt</h2>
-          </div>
-          <PasswordField value={password} onChange={setPassword} />
-        </GlassCard>
-
-        <button type="submit" disabled={loading} className="btn-primary w-full opacity-0 animate-fade-up delay-3">
-          {loading ? "Processing…" : "Reveal payload →"}
-        </button>
-      </form>
-
-      <Toast message={toast?.message} type={toast?.type} onClose={() => setToast(null)} />
+            <div className="flex justify-end">
+              <PrimaryButton type="submit" disabled={loading}>
+                {loading ? "Decrypting Payload…" : "Reveal payload"}
+              </PrimaryButton>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,163 +1,187 @@
-import { useEffect, useRef, useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { LsbPlayground, PipelineOrbit } from "../components/ui/StegoVisuals";
 
-// Images generated for the Bootstrap Security theme
-import imgStego from "../assets/graphics/bs_stego.png";
-import imgCrypto from "../assets/graphics/bs_crypto.png";
-import imgPrivacy from "../assets/graphics/bs_privacy.png";
-
-const PIPELINE_STEPS = [
-  {
-    num: "1",
-    title: "Upload & Select",
-    desc: "Choose an innocent-looking carrier file (image, video, document) and the secret payload you wish to hide."
-  },
-  {
-    num: "2",
-    title: "Military-Grade Encryption",
-    desc: "Your payload is encrypted client-side using military-grade AES-256-GCM. We never see your data or password."
-  },
-  {
-    num: "3",
-    title: "Steganographic Embed",
-    desc: "Our algorithms weave the encrypted bytes directly into the carrier's structure, completely invisible to the eye."
-  },
-  {
-    num: "4",
-    title: "Secure Share",
-    desc: "Download the modified carrier. Share it publicly. Only someone with your exact password can extract the secret."
-  }
+const marqueeItems = [
+  "Steganography",
+  "AES-256-GCM",
+  "Image · Video · Doc",
+  "Privacy Research",
+  "Educational Use",
+  "Lawful Only",
 ];
 
-const FEATURES = [
-  {
-    title: "Steganography Core",
-    desc: "Embed secrets seamlessly into ordinary files without detection.",
-    img: imgStego,
-  },
-  {
-    title: "AES-256 Encryption",
-    desc: "Cryptographically secure your payloads before hiding them.",
-    img: imgCrypto,
-  },
-  {
-    title: "Zero Server Storage",
-    desc: "100% browser-side processing. Your data never leaves your device.",
-    img: imgPrivacy,
-  }
+const pipeline = [
+  { n: "01", title: "Package", desc: "Metadata + compress" },
+  { n: "02", title: "Encrypt", desc: "AES-256-GCM" },
+  { n: "03", title: "Embed", desc: "Image · Video · Doc" },
+  { n: "04", title: "Reveal", desc: "Password unlock" },
 ];
 
 export default function InfoPage() {
-  const location = useLocation();
-
-  useEffect(() => {
-    if (!location.hash) {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-      return;
-    }
-    const id = location.hash.replace("#", "");
-    requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    });
-  }, [location.pathname, location.hash]);
-
   return (
-    <div className="bs-body bg-white min-h-screen font-sans text-gray-800">
-      
-      {/* ═══════ JUMBOTRON HERO ═══════ */}
-      <section id="hero" className="bs-jumbotron text-center">
-        <div className="bs-container">
-          <span className="bs-badge bs-bg-primary mb-3 text-sm px-3 py-2 shadow-sm">
-            Professional Steganography Platform
-          </span>
-          <h1 className="bs-display-5 fw-bold text-gray-900 mb-4">
-            Invisible Security for <br className="hidden md:block"/> the Modern Web.
-          </h1>
-          <p className="bs-lead text-gray-500 mb-5 max-w-2xl mx-auto">
-            Opaque Pixel combines cryptographic strength with advanced steganography.
-            Hide your most sensitive payloads in plain sight, fully within your browser.
+    <div>
+      {/* Hero */}
+      <section className="relative overflow-hidden px-6 pt-16 md:pt-24 pb-20">
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 opacity-70"
+          style={{
+            background:
+              "radial-gradient(60% 50% at 20% 20%, color-mix(in oklab, var(--lilac) 25%, transparent), transparent), radial-gradient(50% 40% at 85% 10%, color-mix(in oklab, var(--warm) 35%, transparent), transparent)",
+          }}
+        />
+        <div className="mx-auto max-w-6xl grid gap-10 md:grid-cols-[1.2fr_1fr] items-center">
+          <div className="animate-float-in">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--card)]/70 px-3 py-1 text-xs text-[color:var(--slate)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--orchid)] animate-pulse" />
+              Steganography Platform
+            </div>
+            <h1 className="mt-5 text-5xl md:text-7xl font-display font-semibold leading-[1.02] tracking-tight">
+              Hi, I'm <span className="text-gradient">Opaque Pixel</span>
+            </h1>
+            <p className="mt-4 text-sm md:text-base font-medium text-[color:var(--orchid)]">
+              Encryption · Steganography · Privacy
+            </p>
+            <p className="mt-5 max-w-xl text-[color:var(--slate)]">
+              Hide secrets inside ordinary files — encrypted, invisible, and built for lawful
+              privacy &amp; research.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/hide"
+                className="inline-flex items-center gap-2 rounded-full bg-[color:var(--ink)] px-6 py-3 text-sm font-medium text-[color:var(--cream)] transition-all hover:bg-[color:var(--orchid)] hover:shadow-[var(--shadow-glow)]"
+              >
+                Get started →
+              </Link>
+              <Link
+                to="/how-it-works"
+                className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-6 py-3 text-sm font-medium text-[color:var(--ink)] transition-all hover:border-[color:var(--orchid)] hover:-translate-y-0.5"
+              >
+                Learn more
+              </Link>
+            </div>
+          </div>
+
+          <div className="relative animate-float-in">
+            <div className="relative rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-6 shadow-[var(--shadow-soft)]">
+              <div className="text-xs uppercase tracking-widest text-[color:var(--dusk)]">
+                Lead Developer &amp; Creator
+              </div>
+              <h3 className="mt-2 text-2xl font-display font-semibold text-[color:var(--ink)]">
+                Dharmik Suhagiya
+              </h3>
+              <p className="mt-1 text-sm text-[color:var(--slate)]">
+                Computer Science Engineering · IBM Cyber Security Project
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <a href="https://github.com/dharmik281208" target="_blank" rel="noreferrer" className="rounded-full bg-[color:var(--muted)] px-3 py-1.5 text-xs font-medium text-[color:var(--ink)] hover:bg-[color:color-mix(in_oklab,var(--lilac)_25%,transparent)]">GitHub</a>
+                <a href="https://www.linkedin.com/in/dhrmik-suhagiya-aab167315/" target="_blank" rel="noreferrer" className="rounded-full bg-[color:var(--muted)] px-3 py-1.5 text-xs font-medium text-[color:var(--ink)] hover:bg-[color:color-mix(in_oklab,var(--lilac)_25%,transparent)]">LinkedIn</a>
+                <a href="mailto:dhrmiksuhagiya@gmail.com" className="rounded-full bg-[color:var(--muted)] px-3 py-1.5 text-xs font-medium text-[color:var(--ink)] hover:bg-[color:color-mix(in_oklab,var(--lilac)_25%,transparent)]">Email</a>
+              </div>
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                {[
+                  { k: "+12", v: "File formats" },
+                  { k: "+4", v: "Pipeline steps" },
+                  { k: "256", v: "Bit encryption" },
+                ].map((s) => (
+                  <div key={s.v} className="rounded-2xl bg-[color:var(--muted)] p-3 text-center">
+                    <div className="font-display text-xl text-[color:var(--ink)]">{s.k}</div>
+                    <div className="text-[11px] text-[color:var(--slate)]">{s.v}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="absolute -inset-3 -z-10 rounded-3xl bg-gradient-to-br from-[color:var(--lilac)]/30 to-[color:var(--warm)]/30 blur-2xl" />
+            <div className="mt-6">
+              <LsbPlayground />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Marquee */}
+      <section className="border-y border-[color:var(--border)] bg-[color:color-mix(in_oklab,var(--cream)_60%,var(--lilac)_10%)] py-4 overflow-hidden">
+        <div className="flex gap-10 whitespace-nowrap animate-marquee">
+          {[...marqueeItems, ...marqueeItems, ...marqueeItems].map((t, i) => (
+            <span key={i} className="text-sm font-medium uppercase tracking-[0.25em] text-[color:var(--slate)]">
+              {t} <span className="text-[color:var(--orchid)]">✦</span>
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* Live pipeline visual */}
+      <section className="px-6 pt-16">
+        <div className="mx-auto max-w-5xl">
+          <PipelineOrbit />
+        </div>
+      </section>
+
+      {/* About */}
+      <section id="about" className="px-6 py-20">
+        <div className="mx-auto max-w-5xl grid gap-10 md:grid-cols-2 items-center">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-[color:var(--orchid)]">About</div>
+            <h2 className="mt-2 text-4xl font-display font-semibold text-[color:var(--ink)]">Let's see that</h2>
+            <p className="mt-4 text-[color:var(--slate)]">
+              Opaque Pixel is for educational, research, cybersecurity training, and lawful personal
+              communication only. You accept full responsibility for your use.
+            </p>
+            <ul className="mt-6 space-y-2 text-sm">
+              <li className="flex items-start gap-2 text-[color:var(--ink)]"><span className="text-[color:var(--orchid)]">✓</span> Research, privacy, watermarking, authorized testing</li>
+              <li className="flex items-start gap-2 text-[color:var(--slate)]"><span className="text-[color:var(--destructive)]">✕</span> Illegal content, malware, unauthorized bypass</li>
+            </ul>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { k: "+12", v: "File formats" },
+              { k: "+4", v: "Pipeline steps" },
+              { k: "256", v: "Bit encryption" },
+            ].map((s) => (
+              <div key={s.v} className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-5 text-center hover:-translate-y-1 hover:shadow-[var(--shadow-soft)] transition">
+                <div className="font-display text-3xl text-gradient">{s.k}</div>
+                <div className="mt-1 text-xs text-[color:var(--slate)]">{s.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pipeline */}
+      <section className="px-6 pb-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-xs uppercase tracking-widest text-[color:var(--orchid)]">Pipeline</div>
+          <h2 className="mt-2 text-4xl font-display font-semibold text-[color:var(--ink)]">How it works</h2>
+          <p className="mt-2 text-[color:var(--slate)]">Four steps from payload to hidden carrier and back.</p>
+          <ol className="mt-10 grid gap-4 md:grid-cols-4">
+            {pipeline.map((p, i) => (
+              <li key={p.n} className="relative">
+                <div className="rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-6 hover:border-[color:var(--orchid)] hover:-translate-y-1 transition-all">
+                  <div className="font-display text-4xl text-[color:var(--dusk)]">{p.n}</div>
+                  <div className="mt-2 text-lg font-display font-semibold text-[color:var(--ink)]">{p.title}</div>
+                  <div className="text-sm text-[color:var(--slate)]">{p.desc}</div>
+                </div>
+                {i < pipeline.length - 1 && (
+                  <div className="hidden md:block absolute top-1/2 -right-2 h-px w-4 bg-gradient-to-r from-[color:var(--lilac)] to-transparent" />
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Warning */}
+      <section className="px-6 pb-24">
+        <div className="mx-auto max-w-4xl rounded-3xl border border-[color:color-mix(in_oklab,var(--warm)_50%,transparent)] bg-[color:color-mix(in_oklab,var(--warm)_25%,transparent)] p-8">
+          <div className="text-xs uppercase tracking-widest text-[color:var(--ink)]">Important</div>
+          <h3 className="mt-2 text-2xl font-display font-semibold text-[color:var(--ink)]">
+            WhatsApp photo &amp; video compression
+          </h3>
+          <p className="mt-3 text-[color:var(--slate)]">
+            Media sent through WhatsApp is recompressed on delivery. Hidden data is usually
+            destroyed in transit. Always share originals, not forwards.
           </p>
-          <div className="d-flex justify-content-center gap-3 flex-wrap">
-            <Link to="/hide" className="bs-btn bs-btn-primary bs-btn-lg shadow-sm">
-              Launch Application
-            </Link>
-            <a href="#pipeline" className="bs-btn bs-btn-outline-secondary bs-btn-lg">
-              Explore Technology
-            </a>
-          </div>
         </div>
       </section>
-
-      {/* ═══════ FEATURES GRID (CARDS) ═══════ */}
-      <section id="features" className="py-16 bg-gray-50">
-        <div className="bs-container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-gray-800 mb-3">Enterprise-Grade Arsenal</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">Built from the ground up to provide uncompromised digital stealth and reliability.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {FEATURES.map((feat) => (
-              <div key={feat.title} className="bs-card h-full transition-transform hover:-translate-y-1 hover:shadow-md duration-300">
-                <img src={feat.img} alt={feat.title} className="w-full h-48 object-cover rounded-t bg-gray-100" />
-                <div className="bs-card-body">
-                  <h3 className="bs-card-title text-gray-800">{feat.title}</h3>
-                  <p className="bs-card-text">{feat.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ PIPELINE (LIST GROUP / TIMELINE) ═══════ */}
-      <section id="pipeline" className="py-16 bg-white border-t border-gray-200">
-        <div className="bs-container max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-gray-800 mb-3">How It Operates</h2>
-            <p className="text-gray-500">Our processing pipeline ensures maximum security without compromising file integrity.</p>
-          </div>
-          
-          <div className="space-y-6">
-            {PIPELINE_STEPS.map((step) => (
-              <div key={step.num} className="bs-card flex flex-col md:flex-row shadow-sm hover:shadow-md transition-shadow">
-                <div className="bg-[#0d6efd] text-white flex items-center justify-center p-6 md:w-32 rounded-t md:rounded-l md:rounded-tr-none">
-                  <span className="text-4xl font-bold opacity-80">{step.num}</span>
-                </div>
-                <div className="bs-card-body p-6 flex flex-col justify-center">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{step.title}</h3>
-                  <p className="text-gray-600 mb-0">{step.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ SUPPORTED FORMATS (PILLS) ═══════ */}
-      <section className="py-16 bg-gray-50 border-t border-gray-200">
-        <div className="bs-container text-center">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-4">Supported Carrier Formats</h2>
-          <p className="text-gray-500 mb-8">Embed payloads into practically any medium. We support a vast array of file types.</p>
-          
-          <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
-            {['PNG', 'JPG', 'BMP', 'WEBP', 'MP4', 'AVI', 'MKV', 'MP3', 'WAV', 'FLAC', 'PDF', 'DOCX', 'TXT'].map(format => (
-              <span key={format} className="bs-badge bs-bg-secondary text-sm px-4 py-2 shadow-sm hover:bs-bg-primary transition-colors cursor-default">
-                {format}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════ FOOTER ═══════ */}
-      <footer className="py-10 text-center bg-white border-t border-gray-200">
-        <div className="bs-container">
-          <p className="text-gray-500 mb-1">© {new Date().getFullYear()} Opaque Pixel. Built for lawful use.</p>
-          <p className="text-sm text-gray-400">Dharmik Suhagiya · Computer Science Engineering</p>
-        </div>
-      </footer>
-      
     </div>
   );
 }

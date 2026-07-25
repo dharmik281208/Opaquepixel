@@ -117,7 +117,7 @@ export default function Header() {
             type="button"
             onClick={toggleTheme}
             className="btn-ghost p-2.5 flex items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95"
-            title={theme === "bw" ? "Switch to Dark Emerald Mode" : "Switch to Monochrome White Mode"}
+            title={theme === "bw" ? "Switch to Cosmic Glow Mode" : "Switch to Monochrome White Mode"}
             aria-label="Toggle Theme"
           >
             <div className={`transition-transform duration-500 ease-out ${theme === "bw" ? "rotate-180" : "rotate-0"}`}>
@@ -126,7 +126,7 @@ export default function Header() {
                   <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/>
                 </svg>
               ) : (
-                <svg className="w-4 h-4 fill-current text-emerald-400" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 fill-current text-purple-400" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" fill="none" />
                   <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" />
                 </svg>
@@ -166,7 +166,7 @@ export default function Header() {
 
       {/* Mobile Glass Backdrop Blur Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="mobile-drawer-menu md:hidden fixed inset-x-4 top-20 z-50 bg-black/85 backdrop-blur-3xl saturate-200 rounded-3xl p-5 shadow-2xl border border-emerald-500/40 animate-fade-up overflow-hidden">
+        <div className="mobile-drawer-menu md:hidden fixed inset-x-4 top-20 z-50 bg-black/85 backdrop-blur-3xl saturate-200 rounded-3xl p-5 shadow-2xl border border-accent-purple/40 animate-fade-up overflow-hidden">
           <nav className="flex flex-col gap-2" aria-label="Main Mobile">
             {authed ? (
               <>

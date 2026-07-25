@@ -29,7 +29,7 @@ export default function Logo({ size = "md", showText = true, animate = true, cla
               width="6"
               height="6"
               rx="1.5"
-              fill="#34d399"
+              fill="#a855f7"
               className={animate ? "logo-pixel" : ""}
               style={{
                 fillOpacity: o,
